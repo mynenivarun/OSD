@@ -1,0 +1,80 @@
+
+→Add new system call numfreepages() which returns number of free page frames in physical 
+memory
+
+→ When process forks,
+i. Create shared mapping to the same page frames in physical page
+ 
+ii. Shared pages are read-only 
+
+→ When data is written to shared pages, 
+i. Page fault is generated
+
+ii. xv6 allocates new page frame in physical memory, and copy memory ofw original 
+before write we have to make changes in: 
+• vm.c 
+• kalloc.c 
+• trap.c 
+• defs.h
+• user.h 
+• usys.S 
+• syscall.c
+• sysproc.c
+• syscall.h
+
+vm.c
+Make walkpgdir1 function to use walkpgdir function in trap.c 
+
+kalloc.c
+
+• kmem
+ Add num_of_free_pages, reference_count[100000]kinit
+ Initialize num_of_free_pages reference_count
+
+• kalloc
+This function is called when new page allocates.
+Make reference count 1, and decrease number of free pages.
+
+• numfreepages
+Function for returns number of free pages
+
+• increase_refcount 
+Function for increses reference count 
+
+• num_refcount
+Function for returns value of reference count 
+
+• decrease_refcount
+Function for decreases reference count 
+
+trap.c
+Handling page fault(T_PGFLT). When process tries to write on read only page, page fault 
+occurs.
+If there is only one process that references this page, then change authority to writable.
+If there are several processes that reference this page, then make new page and copy the 
+contents, and decrease reference count. 
+
+defs.h
+Add definition of new funtions: numfree increase_refcount num_refcount 
+decrease_refcount 
+
+user.h
+Add system call for numfreepages 
+
+usys.S
+Add system call for numfreepages
+
+syscall.c
+Add sys_numfree 
+
+sysproc.c
+Add interrupt function for numfreepages
+
+syscall.h
+Add system call number(23) for numfreepages
+
+After completing this type commands 
+
+$make
+$make qemu-nox
+Now in sh we have to type $testcow

@@ -1,0 +1,68 @@
+get-pinfo pid
+
+
+1.	git clone git://github.com/mit-pdos/xv6-public.git xv6-getpinfo
+
+        2.	Open syscall.h and add the following 
+                              #define SYS_getpinfo    22
+
+3.	    Open defs.h and add the following in //proc.c section
+
+                   int		getpinfo (void);
+4.	open user.h file
+                   add in systemcall section
+                      Int getpinfo (void); 
+5.	open proc.c and add the following function:
+           int
+	getpinfo ()
+	{
+	struct proc *p;
+	//Enables interrupts on this processor.
+	sti();
+	
+	//Loop over process table looking for process with pid.
+	acquire(&ptable.lock);
+	cprintf("name \t pid \t state \t \n");
+	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+	  if(p->state == SLEEPING)
+		  cprintf("%s \t %d \t SLEEPING \t  \n ", p->name,p->pid);
+		else if(p->state == RUNNING)
+	 	  cprintf("%s \t %d \t RUNNING \t \n ", p->name,p->pid);
+		else if(p->state == RUNNABLE)
+	 	  cprintf("%s \t %d \t RUNNABLE \t  \n ", p->name,p->pid);
+	}
+	release(&ptable.lock);
+	return 22;
+	}
+
+6.	open sysproc.c and add following function:
+         int
+	sys_getpinfo(void)
+	{
+	  return getpinfo();
+	}
+
+7.	open usys.S and add the following 
+                       SYSCALL(getpinfo)
+8.	open the syscall.c file and add the following
+              //Add this where the other system calls are defined in syscall.c
+                          extern int sys_getpinfo(void);
+            //Add this inside static int (*syscalls[])(void)
+                     [SYS_getpinfo]     sys_getpinfo,
+9.	Create user program getpinfo.c
+#include "types.h"
+	#include "stat.h"
+	#include "user.h"
+	#include "fcntl.h"
+	
+	int main(void){
+	  getpinfo ();
+	  exit();
+	}
+
+10.	 nano  Makefile
+                  Add getpinfo\ to uprogs
+                  Add getpinfo.c to Extra
+11.	make
+12.	make qemu-nox
+13.	$ getpinfo

@@ -1,0 +1,8 @@
+
+We successfully created a basic XV6 shell with what our team believes to 
+be necessary for a common usage. We learnt a lot from working with a 
+basic Operating System and would like to thank everyone for this 
+opportunity. The journey to modifying the XV6 and implementing ourown 
+shell was a very interesting and eventful one and even though sometimes, 
+our code was like a shot in the dark, we believe that we achieved what we 
+wanted to in the end

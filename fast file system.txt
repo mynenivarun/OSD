@@ -1,0 +1,82 @@
+
+
+Step 1: git clone https://github.com/nextbytes/Advanced-xv6
+Step 2: cd Advanced-xv6
+Step 3: Type cd 7 and click tab 
+DONE
+
+FFS Main features:
+•	Cylinder groups to improve locality.
+•	Copy of superblock in each cylinder group (on different platters)
+                                     to improve fault tolerance.
+•	Free block bitmap per cylinder group,
+•	supports allocation of consecutive blocks.
+•	Larger blocks (multiple of 4kB) for improved throughput.
+•	Clustering of I/O operations to further improve throughput[Pea88].
+•	Fragments (1/2 - 1/8 blocks) to reduce fragmentation.
+•	Pre-allocated inodes scattered throughout cylinder groups,
+•	Bitmap free list for fast allocation.
+•	Ability to rebuild free lists after crash (fsck).
+Cylinder groups:
+•	If possible, file direct-blocks and index blocks are allocated from same CG as inode,
+•	up to a maximum (25% of CG capacity) to avoid squeezing out small files.
+•	Attempt to allocate consecutive logical blocks rotationally optimal.
+•	Aided by bitmap free list.
+•	Attempt to allocate (plain) files' inodes in same CG as directory.
+•	Spread directories across CGs.
+Fragments:
+•	Last block of small file is actually array of consecutive fragments.
+•	Fragments only allowed for files not using indirect blocks.
+•	Fragment array is unaligned but must not span blocks.
+When extending:
+•	try allocating extra fragment from same block,
+otherwise copy.
+•	Allocation supported by using fragment granularity in free block bitmap.
+Clustering:
+
+
+
+•	Try to allocate logically contiguous blocks contiguously (up to 64kB).
+•	Delay writes until ready to write whole cluster (if possible).
+•	Read ahead full cluster for sequentially accessed files.
+•	Reallocation of modified blocks to improve locality.
+•	Separate cluster map to help finding clusters.
+Variant:
+•	Linux Extended-2 File System (Ext2FS)
+•	(Logical) block groups rather than cylinder groups.
+•	Inode array in each block group.
+•	Store (short) symbolic links in inode.
+•	Preallocates contiguous blocks.
+
+ext2
+•	Ext2FS Disk layout
+FFS Problem: 
+•	Synchronous updates
+•	Need to be able to recover consistent state of FS after crash.
+Synchronous writes of metadata for consistency on disk:
+On file creation:
+•	Write inode before updating directory.
+•	Write directory.
+On file deletion:
+•	Write updated directory before deallocating inode.
+•	Write updated inode before freeing blocks in bitmap.
+On file extension:
+•	Write data block before inode (for security).
+•	Write updated inode/indirect block before updating bitmap.
+•	Similarly on file truncation.
+•	Running fsck after crash rebuilds consistent bitmaps.
+•	Synchronous I/O limiting when creating/deleting many files.
+Improvement:
+Delayed writes/soft updates[GP94]:
+•	Consistency does not require synchronous writes.
+•	Must ensure that dependent writes are kept in sequence.
+•	E.g., ensure that on creation inode is written before bitmap.
+•	Unrelated reads or writes can still occur in arbitrary order.
+Need to:
+•	enhance disk scheduler to honour write dependencies,
+•	use copy-on-write on source blocks to avoid blocking further modifications.
+•	
+Cost:
+•	Slightly more loss of user data during crash.
+•	Much more complicated disk scheduling and interrupt processing.
+•	Disks can reorder write requests internally

@@ -1,0 +1,38 @@
+
+
+--> Open sysproc.c and Type The Below Code At The End
+		"int
+		 sys_halt(void)
+		 {
+		   outb(0xf4, 0x00);
+		   return 0;
+		 }"
+
+--> Open usys.S Add The Below Code To The Last
+		"SYSCALL(halt)"
+
+--> Open syscall.h Add The Below Code To The Last
+		"#define SYS_halt 22"
+
+--> Open syscall.c and add The Below Codes
+		"extern int sys_halt(void);"
+		"[SYS_halt] sys_halt,"
+
+--> Open user.h and add the following Code under System Call Section
+		"int halt(void);"
+
+--> And In make File Find The Definition Of QEMUOPTS And Add The Following Code To The End Of The Definition
+		"-device isa-debug-exit,iobase=0xf4,iosize=0x04"
+
+--> Now Create a userprogram With a Name shutdown.c by Typing nano shutdown.c and Type The Below Code In It
+		"#include "types.h"
+		 #include "stat.h"
+		 #include "user.h"
+		 
+		 int main(int argc, char *argv[])
+		 {
+			printf(1,"Hello Let's Get Shutdown\n");
+		 	halt();
+		 	exit();
+		 }"
+--> Now Add The shutdown.c to the Makefile and run the XV6 Program		

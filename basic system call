@@ -1,0 +1,63 @@
+Basic System call
+Process for creating system call in XV6
+
+1-----> nano syscall.h
+
+#define SYS_varun 22
+
+
+2-----> nano syscall.c
+
+[SYS_varun] sys_varun,
+
+extern int sys_varun(void);
+
+
+3-----> nano sysproc.c
+
+// varun
+int 
+sys_varun(void)
+{
+return 2001;
+}
+
+
+4-----> nano usys.S
+
+SYSCALL(varun)
+
+
+
+5-----> nano user.h
+
+int varun(void);
+
+
+
+6-----> nano varun.c
+
+#include "types.h"
+#include "stat.h"
+#include "user.h"
+
+int main(void){
+printf(1, "Hi i'm varun. I was born in %d \n", varun());
+exit();
+}
+
+
+
+7-----> nano Makefile 
+
+EXTRA
+varun.c
+
+UPROGS
+_varun\
+
+8-----> make
+9-----> make qemu-nox
+
+
+.

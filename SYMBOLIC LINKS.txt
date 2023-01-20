@@ -1,0 +1,5 @@
+
+OUT SIDE XV6 
+IN XV6 DIRECTORY 
+
+$ find / -type d -name home

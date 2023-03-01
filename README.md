@@ -1,2 +1,2 @@
 # OSD
-unix operating system functions
+xv6 unix operating system functions
